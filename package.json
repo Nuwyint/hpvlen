@@ -4,7 +4,7 @@
   "private": true,
   "description": "Password-gated Hunger Games quest finale for Vercel",
   "scripts": {
-    "test": "node --test test/unlock.test.js",
+    "test": "node --test test/*.test.js",
     "start": "node --env-file-if-exists=.env scripts/dev.js"
   },
   "engines": {
