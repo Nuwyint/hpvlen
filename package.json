@@ -1,0 +1,13 @@
+{
+  "name": "capitol-terminal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Password-gated Hunger Games quest finale for Vercel",
+  "scripts": {
+    "test": "node --test test/unlock.test.js",
+    "start": "node --env-file-if-exists=.env scripts/dev.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
