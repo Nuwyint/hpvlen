@@ -8,7 +8,7 @@
   <title>Панем — закрытый архив</title>
   <meta name="description" content="Закрытый канал связи. Доступ по коду.">
   <link rel="stylesheet" href="/style.css">
-  <script src="/app.js" defer></script>
+  <script src="/app.js" type="module"></script>
 </head>
 <body>
   <canvas id="celebration" aria-hidden="true" hidden></canvas>
@@ -26,7 +26,7 @@
         <form id="unlock-form">
           <label for="password">КОД ДОСТУПА</label>
           <div class="input-wrap"><input id="password" name="password" type="password" placeholder="Введите код" required maxlength="80" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="input-note feedback"><button class="visibility" id="visibility" type="button" aria-label="Показать код" aria-pressed="false">ПОКАЗАТЬ</button></div>
-          <p class="input-note" id="input-note">Латинские буквы · регистр не имеет значения</p>
+          <p class="input-note" id="input-note">Введите ответ на английском языке. Регистр не имеет значения.</p>
           <button class="submit" id="submit" type="submit"><span id="submit-text">ВОССТАНОВИТЬ ПЕРЕДАЧУ</span><span aria-hidden="true">↗</span></button>
           <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
         </form>
@@ -39,11 +39,28 @@
         <p class="signature" id="signature"></p>
         <div class="complete" id="complete"></div>
         <button type="button" class="replay" id="replay">ЕЩЁ САЛЮТ <span aria-hidden="true">✦</span></button>
+        <button type="button" class="reset video-replay" id="video-replay">ВЕРНУТЬ ГУСЕЙ В ЭФИР <span aria-hidden="true">▶</span></button>
         <button type="button" class="reset" id="reset">ЗАКРЫТЬ КАНАЛ <span aria-hidden="true">↗</span></button>
       </section>
       <aside class="art" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="orbit orbit-c"></div><div class="art-cross art-cross-a">+</div><div class="art-cross art-cross-b">+</div><div class="arena"><div class="arena-core"></div></div><span class="art-number" id="art-number">74</span><span class="art-label" id="art-label">PANEM / SIGNAL ARCHIVE</span><span class="art-bottom" id="art-bottom">THE FINAL DECISION<br>IS NOT ON RECORD.</span></aside>
     </main>
     <footer><span>ПАНЕМ · СЛУЖЕБНЫЙ КАНАЛ</span><span id="footer-state">СОЕДИНЕНИЕ ЗАЩИЩЕНО <i></i></span></footer>
   </div>
+  <dialog id="broadcast" class="broadcast" aria-labelledby="broadcast-title" aria-describedby="broadcast-lead">
+    <div class="broadcast-layout">
+      <div class="broadcast-copy">
+        <div class="eyebrow">ВНЕПЛАНОВОЕ ОБРАЩЕНИЕ</div>
+        <h2 id="broadcast-title"></h2>
+        <p id="broadcast-lead"></p>
+        <span class="broadcast-seal" aria-hidden="true">СОГЛАСОВАНО<br>С ГУСЯМИ</span>
+      </div>
+      <div class="video-frame"><video id="birthday-video" controls playsinline preload="none" aria-label="Видеопоздравление"></video></div>
+      <div class="broadcast-actions">
+        <p id="video-status" role="status" aria-live="polite"></p>
+        <button type="button" class="sound-button" id="video-sound" hidden>ВКЛЮЧИТЬ ЗВУК</button>
+        <button type="button" class="broadcast-skip" id="broadcast-skip">ПРОПУСТИТЬ ГУСИНУЮ ДИПЛОМАТИЮ <span aria-hidden="true">↗</span></button>
+      </div>
+    </div>
+  </dialog>
 </body>
 </html>

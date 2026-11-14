@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Метод не поддерживается.' });
   }
-  const expected = process.env.QUEST_PASSWORD;
+  const expected = process.env.QUEST_PASSWORD || 'nightlock';
   if (!expected || !expected.trim()) {
     return res.status(503).json({ error: 'Канал временно недоступен. Обратитесь к организатору.' });
   }
@@ -37,6 +37,12 @@ module.exports = async function handler(req, res) {
       'Пусть сложные шифры сходятся, нужные повороты находятся вовремя, а рядом всегда будет своя команда. Желаем тебе ярких идей, крутых приключений и счастья далеко за пределами игры. Пусть удача всегда будет на твоей стороне!'
     ],
     signature: 'ОТ ИГРОКОВ — ОРГАНИЗАТОРУ · ENCOUNTER',
+    broadcast: {
+      title: 'Антон, это не подсказка.',
+      lead: 'Капитолий пал. В эфир вышла гусиная делегация. Требование одно: поздравить именинника.',
+      videoUrl: '/broadcast-74.mp4',
+      posterUrl: '/broadcast-poster.jpg'
+    },
     footer: 'МИССИЯ НА СЕГОДНЯ: ПРИНИМАТЬ ПОЗДРАВЛЕНИЯ'
   });
 };

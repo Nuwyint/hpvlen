@@ -1,4 +1,5 @@
 'use strict';
+import { startUnlockedPlayback } from './media.mjs';
 const form = document.querySelector('#unlock-form');
 const field = document.querySelector('#password');
 const feedback = document.querySelector('#feedback');
@@ -6,6 +7,7 @@ const submit = document.querySelector('#submit');
 const submitText = document.querySelector('#submit-text');
 const visibility = document.querySelector('#visibility');
 let pending = false;
+let unlockedBroadcast = null;
 visibility.addEventListener('click', () => {
   const reveal = field.type === 'password';
   field.type = reveal ? 'text' : 'password';
@@ -53,8 +55,12 @@ form.addEventListener('submit', async event => {
     document.querySelector('#art-bottom').textContent = 'СЕГОДНЯ ИГРАЕМ ДЛЯ ТЕБЯ.';
     document.body.classList.add('unlocked');
     field.value = '';
-    document.querySelector('#success-title').focus();
-    startCelebration();
+    unlockedBroadcast = result.broadcast;
+    if (unlockedBroadcast) showBroadcast();
+    else {
+      document.querySelector('#success-title').focus();
+      startCelebration();
+    }
   } catch {
     feedback.textContent = 'Связь с архивом прервана. Проверьте интернет и повторите попытку.';
   } finally {
@@ -64,6 +70,11 @@ form.addEventListener('submit', async event => {
   }
 });
 document.querySelector('#reset').addEventListener('click', () => {
+  finishBroadcast(false);
+  unlockedBroadcast = null;
+  video.removeAttribute('src');
+  video.removeAttribute('poster');
+  video.load();
   stopCelebration();
   document.querySelector('#access').hidden = false;
   document.querySelector('#success').hidden = true;
@@ -81,6 +92,73 @@ document.querySelector('#reset').addEventListener('click', () => {
   visibility.setAttribute('aria-pressed', 'false'); visibility.setAttribute('aria-label', 'Показать код');
   feedback.textContent = ''; field.focus();
 });
+
+const broadcast = document.querySelector('#broadcast');
+const video = document.querySelector('#birthday-video');
+const videoStatus = document.querySelector('#video-status');
+const soundButton = document.querySelector('#video-sound');
+let broadcastAttempt = 0;
+
+async function showBroadcast() {
+  if (!unlockedBroadcast) return;
+  stopCelebration();
+  const attempt = ++broadcastAttempt;
+  document.querySelector('#broadcast-title').textContent = unlockedBroadcast.title;
+  document.querySelector('#broadcast-lead').textContent = unlockedBroadcast.lead;
+  videoStatus.textContent = '';
+  soundButton.hidden = true;
+  if (video.getAttribute('src') !== unlockedBroadcast.videoUrl) {
+    video.src = unlockedBroadcast.videoUrl;
+    video.poster = unlockedBroadcast.posterUrl;
+    video.load();
+  } else video.currentTime = 0;
+  if (!broadcast.open) broadcast.showModal();
+  const isCurrent = () => attempt === broadcastAttempt && broadcast.open;
+  const mode = await startUnlockedPlayback(video, isCurrent);
+  if (!isCurrent()) return;
+  if (mode === 'muted') {
+    videoStatus.textContent = 'Капитолий заглушил эфир. Верни ему голос.';
+    soundButton.textContent = 'ВКЛЮЧИТЬ ЗВУК';
+    soundButton.hidden = false;
+  } else if (mode === 'manual') {
+    videoStatus.textContent = 'Эфир ждёт одного нажатия.';
+    soundButton.textContent = 'ЗАПУСТИТЬ ТРАНСЛЯЦИЮ';
+    soundButton.hidden = false;
+  }
+}
+function finishBroadcast(celebrate = true) {
+  ++broadcastAttempt;
+  video.pause();
+  if (broadcast.open) broadcast.close();
+  if (celebrate && !document.querySelector('#success').hidden) {
+    startCelebration();
+    document.querySelector('#success-title').focus();
+  }
+}
+soundButton.addEventListener('click', async () => {
+  const attempt = broadcastAttempt;
+  video.muted = false;
+  try {
+    await video.play();
+    if (attempt !== broadcastAttempt || !broadcast.open) {video.pause();return;}
+    soundButton.hidden = true;
+    videoStatus.textContent = '';
+  } catch {
+    if (attempt !== broadcastAttempt || !broadcast.open) return;
+    videoStatus.textContent = 'Связь барахлит. Попробуй кнопку воспроизведения на видео.';
+    soundButton.hidden = false;
+  }
+});
+video.addEventListener('volumechange', () => {
+  if (!video.muted) {soundButton.hidden = true;videoStatus.textContent = '';}
+});
+video.addEventListener('ended', () => finishBroadcast());
+video.addEventListener('error', () => {
+  if (broadcast.open) videoStatus.textContent = 'Трансляцию зажевало. Поздравление ниже всё равно твоё.';
+});
+document.querySelector('#broadcast-skip').addEventListener('click', () => finishBroadcast());
+document.querySelector('#video-replay').addEventListener('click', showBroadcast);
+broadcast.addEventListener('cancel', event => {event.preventDefault();finishBroadcast();});
 
 // Local effects: no sound, external services, or persistent animation loop.
 const canvas = document.querySelector('#celebration');
